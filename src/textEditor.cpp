@@ -72,6 +72,15 @@ EditorConf g_editorConf{};
 
 namespace Editor
 {
+
+    enum Keys
+    {
+        up = 1000,
+        down,
+        left,
+        right,
+    };
+
     namespace Buffer
     {
         std::string &getBuffer()
@@ -120,26 +129,26 @@ namespace Editor
         }
     }
 
-    void moveCursor(char key)
+    void moveCursor(int key)
     {
         switch (key)
         {
-        case 'A':
+        case up:
             if (g_editorConf.cursorY != 0)
                 g_editorConf.cursorY--;
             break;
 
-        case 'B':
+        case down:
             if (g_editorConf.cursorY != getWindowSize().getWSRows() - 1)
                 g_editorConf.cursorY++;
             break;
 
-        case 'D':
+        case left:
             if (g_editorConf.cursorX != 0)
                 g_editorConf.cursorX--;
             break;
 
-        case 'C':
+        case right:
             if (g_editorConf.cursorX != getWindowSize().getWSCol() - 1)
                 g_editorConf.cursorX++;
             break;
@@ -161,7 +170,7 @@ namespace Editor
         Buffer::clearBuffer();
     }
 
-    char readKey()
+    int readKey()
     {
         int returnedInt{};
         char c{};
@@ -182,8 +191,19 @@ namespace Editor
                 return c;
             if (seq[0] == '[')
             {
-                if (seq[1] == 'A' || seq[1] == 'B' || seq[1] == 'C' || seq[1] == 'D')
-                    return seq[1];
+                switch (seq[1])
+                {
+                case 'A':
+                    return up;
+                case 'B':
+                    return down;
+                case 'C':
+                    return right;
+                case 'D':
+                    return left;
+                default:
+                    break;
+                }
             }
         }
         return c;
@@ -191,7 +211,7 @@ namespace Editor
 
     void processKeypress()
     {
-        char c = readKey();
+        int c = readKey();
         switch (c)
         {
         case (CTRL_KEY('q')):
@@ -200,10 +220,10 @@ namespace Editor
             exit(EXIT_SUCCESS);
             break;
 
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
+        case up:
+        case down:
+        case left:
+        case right:
             moveCursor(c);
             break;
 
