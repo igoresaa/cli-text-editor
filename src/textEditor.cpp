@@ -81,6 +81,8 @@ namespace Editor
         right,
         pageUp,
         pageDown,
+        homeKey,
+        endKey,
     };
 
     namespace Buffer
@@ -201,6 +203,12 @@ namespace Editor
                     {
                         switch (seq[1])
                         {
+                        case '1':
+                        case '7':
+                            return homeKey;
+                        case '4':
+                        case '8':
+                            return endKey;
                         case '5':
                             return pageUp;
                         case '6':
@@ -223,10 +231,26 @@ namespace Editor
                         return right;
                     case 'D':
                         return left;
-
+                    case 'H':
+                        return homeKey;
+                    case 'F':
+                        return endKey;
                     default:
                         break;
                     }
+                }
+            }
+            else if (seq[0] == 'O')
+            {
+                switch (seq[1])
+                {
+                case 'H':
+                    return homeKey;
+                case 'F':
+                    return endKey;
+                
+                default:
+                    break;
                 }
             }
         }
@@ -250,16 +274,23 @@ namespace Editor
         case right:
             moveCursor(c);
             break;
-        
+
         case pageUp:
         case pageDown:
+        {
+            for (int i = getWindowSize().getWSRows(); i > 0; i--)
             {
-                for (int i = getWindowSize().getWSRows(); i > 0; i--)
-                {
-                    moveCursor(c == pageUp ? up : down);
-                }
-                
+                moveCursor(c == pageUp ? up : down);
             }
+        }
+        break;
+
+        case homeKey:
+            g_editorConf.cursorX = 0;
+            break;
+        case endKey:
+            g_editorConf.cursorX = getWindowSize().getWSCol() - 1;
+            break;
         
         default:
             break;
