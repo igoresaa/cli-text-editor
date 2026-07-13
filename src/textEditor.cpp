@@ -79,6 +79,8 @@ namespace Editor
         down,
         left,
         right,
+        pageUp,
+        pageDown,
     };
 
     namespace Buffer
@@ -191,18 +193,40 @@ namespace Editor
                 return c;
             if (seq[0] == '[')
             {
-                switch (seq[1])
+                if (seq[1] >= '0' && seq[1] <= '9')
                 {
-                case 'A':
-                    return up;
-                case 'B':
-                    return down;
-                case 'C':
-                    return right;
-                case 'D':
-                    return left;
-                default:
-                    break;
+                    if (read(STDIN_FILENO, &seq[2], 1) != 1)
+                        return c;
+                    if (seq[2] == '~')
+                    {
+                        switch (seq[1])
+                        {
+                        case '5':
+                            return pageUp;
+                        case '6':
+                            return pageDown;
+
+                        default:
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    switch (seq[1])
+                    {
+                    case 'A':
+                        return up;
+                    case 'B':
+                        return down;
+                    case 'C':
+                        return right;
+                    case 'D':
+                        return left;
+
+                    default:
+                        break;
+                    }
                 }
             }
         }
@@ -226,7 +250,17 @@ namespace Editor
         case right:
             moveCursor(c);
             break;
-
+        
+        case pageUp:
+        case pageDown:
+            {
+                for (int i = getWindowSize().getWSRows(); i > 0; i--)
+                {
+                    moveCursor(c == pageUp ? up : down);
+                }
+                
+            }
+        
         default:
             break;
         }
